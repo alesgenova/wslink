@@ -26,3 +26,30 @@ jobs:
       - name: Build Web client
         run: npm run build:release
         working-directory: ${{env.webclient}}
+
+  unittest:
+    name: Unit test ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install and Run Tests
+      run: |
+        pip install .
+        python -m unittest discover python/src/tests
